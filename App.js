@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import type {Node} from 'react';
 import {
   StyleSheet,
@@ -26,15 +26,47 @@ import {
 const App: () => Node = () => {
   console.disableYellowBox = true;
 
-  let tip = data.tip;
+  //기존 꿀팁을 저장하고 있을 상태
+  const [state, setState] = useState([]);
+  //카테고리에 따라 다른 꿀팁을 그때그때 저장관리할 상태
+  const [cateState, setCateState] = useState([]);
 
-  //  --> data.Json은 tip이라는 키에 리스트가 물린 딕셔너리 형태
-  //  따라서 tip키를 사용하여 리스트를 가져옴
+  //컴포넌트에 상태를 여러개 만들어도 됨
+  //관리할 상태이름과 함수는 자유자재로 정의할 수 있음
+  //초기 상태값으로 리스트, 참거짓형, 딕셔너리, 숫자, 문자 등등 다양하게 들어갈 수 있음.
+  const [ready, setReady] = useState(true);
+
+  useEffect(() => {
+    //뒤의 1000 숫자는 1초를 뜻함
+    //1초 뒤에 실행되는 코드들이 담겨 있는 함수
+    setTimeout(() => {
+      //꿀팁 데이터로 모두 초기화 준비
+      let tip = data.tip;
+      setState(tip);
+      setCateState(tip);
+      setReady(false);
+    }, 1000);
+  }, []);
+
+  const category = cate => {
+    if (cate == '전체보기') {
+      //전체보기면 원래 꿀팁 데이터를 담고 있는 상태값으로 다시 초기화
+      setCateState(state);
+    } else {
+      setCateState(
+        state.filter(d => {
+          return d.category == cate;
+        }),
+      );
+    }
+  };
 
   let todayWeather = 10 + 17;
   let todayCondition = '흐림';
 
-  return (
+  return ready ? (
+    <Loading />
+  ) : (
     /*
     return 구문 안에서는 {슬래시 + * 방식으로 주석
     */
@@ -49,22 +81,45 @@ const App: () => Node = () => {
         style={styles.middleContainer}
         horizontal
         indicatorStyle={'white'}>
-        <TouchableOpacity style={styles.middleButton01}>
+        <TouchableOpacity
+          style={styles.middleButtonAll}
+          onPress={() => {
+            category('전체보기');
+          }}>
+          <Text style={styles.middleButtonTextAll}>전체보기</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.middleButton01}
+          onPress={() => {
+            category('생활');
+          }}>
           <Text style={styles.middleButtonText}>생활</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.middleButton02}>
+        <TouchableOpacity
+          style={styles.middleButton02}
+          onPress={() => {
+            category('재테크');
+          }}>
           <Text style={styles.middleButtonText}>재테크</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.middleButton03}>
+        <TouchableOpacity
+          style={styles.middleButton03}
+          onPress={() => {
+            category('반려견');
+          }}>
           <Text style={styles.middleButtonText}>반려견</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.middleButton04}>
+        <TouchableOpacity
+          style={styles.middleButton04}
+          onPress={() => {
+            category('꿀팁 찜');
+          }}>
           <Text style={styles.middleButtonText}>꿀팁 찜</Text>
         </TouchableOpacity>
       </ScrollView>
       <View style={styles.cardContainer}>
         {/* 하나의 카드 영역을 나타내는 View */}
-        {tip.map((content, i) => {
+        {cateState.map((content, i) => {
           return <Card content={content} key={i} />;
         })}
       </View>
