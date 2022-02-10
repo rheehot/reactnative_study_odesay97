@@ -63,20 +63,23 @@ const App: () => Node = () => {
       </ScrollView>
       <View style={styles.cardContainer}>
         {/* 하나의 카드 영역을 나타내는 View */}
-
-        {/* --> 리스트.map일 경우 리스트의 요소 하나하나를 순차적으로 반복하는 형태
-        ---> Json 에 있는 리스트의 내용을 map으로 반복하여 return(랜더링 --> 뷰의 내용을 화면에 그려줌)
-
-       [중요 규칙] --> JSX문법에서 반복으로 돌릴 경우에 그 안의 최상위 태그는 유니크한 Key(키)값을 가져야 함        
-          key={i} 부분
-        */}
+        {/* --> i%2가 짝수일 경우 참항에 있는 JSX코드가 리턴(랜더링), i%2가 홀수일 경우 거짓항에 있는 JSX코드가 리턴(랜더링) */}
         {tip.map((content, i) => {
-          {
-            /*> JSX 문법 안에서 tip.map()이라는 함수를 사용하기 위해 {}(중괄호)로 감싸였다.  */
-          }
-          return (
-            <View style={styles.card} key={i}>
-              {/* key={i} 부분 : 반복되는 영역의 최상위 태그에서 유니크한 키 값을 가지고 있음 */}
+          return i % 2 == 0 ? (
+            <View style={styles.cardEven} key={i}>
+              <Image style={styles.cardImage} source={{uri: content.image}} />
+              <View style={styles.cardText}>
+                <Text style={styles.cardTitle} numberOfLines={1}>
+                  {content.title}
+                </Text>
+                <Text style={styles.cardDesc} numberOfLines={3}>
+                  {content.desc}
+                </Text>
+                <Text style={styles.cardDate}>{content.date}</Text>
+              </View>
+            </View>
+          ) : (
+            <View style={styles.cardOdd} key={i}>
               <Image style={styles.cardImage} source={{uri: content.image}} />
               <View style={styles.cardText}>
                 <Text style={styles.cardTitle} numberOfLines={1}>
