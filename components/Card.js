@@ -1,10 +1,15 @@
 import React from 'react';
-import {View, Text, Image, StyleSheet} from 'react-native';
+import {View, Image, Text, StyleSheet, TouchableOpacity} from 'react-native';
 
-//비구조 할당 방식으로 넘긴 속성 데이터를 꺼내 사용함
-export default function Card({content}) {
+//MainPage로 부터 navigation 속성을 전달받아 Card 컴포넌트 안에서 사용
+export default function Card({content, navigation}) {
   return (
-    <View style={styles.card}>
+    //카드 자체가 버튼역할로써 누르게되면 상세페이지로 넘어가게끔 TouchableOpacity를 사용
+    <TouchableOpacity
+      style={styles.card}
+      onPress={() => {
+        navigation.navigate('DetailPage');
+      }}>
       <Image style={styles.cardImage} source={{uri: content.image}} />
       <View style={styles.cardText}>
         <Text style={styles.cardTitle} numberOfLines={1}>
@@ -15,15 +20,13 @@ export default function Card({content}) {
         </Text>
         <Text style={styles.cardDate}>{content.date}</Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
     flex: 1,
-    //컨텐츠들을 가로로 나열
-    //세로로 나열은 column <- 디폴트 값임
     flexDirection: 'row',
     margin: 10,
     borderBottomWidth: 0.5,
