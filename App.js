@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import favicon from './assets/favicon.png';
 import main from './assets/windmill.jpg';
+import data from './data.json';
 
 import {
   Colors,
@@ -22,16 +23,26 @@ import {
 } from 'react-native/Libraries/NewAppScreen';
 
 const App: () => Node = () => {
-  // const isDarkMode = useColorScheme() === 'dark';
-  // const customAlert = () => {
-  //   Alert.alert('TouchableOpacity에도 onPress 속성이 있습니다');
-  // };
-
   console.disableYellowBox = true;
 
+  let tip = data.tip;
+
+  //  --> data.Json은 tip이라는 키에 리스트가 물린 딕셔너리 형태
+  //  따라서 tip키를 사용하여 리스트를 가져옴
+
+  let todayWeather = 10 + 17;
+  let todayCondition = '흐림';
+
   return (
+    /*
+    return 구문 안에서는 {슬래시 + * 방식으로 주석
+    */
+
     <ScrollView style={styles.container}>
       <Text style={styles.title}>나만의 꿀팁</Text>
+      <Text style={styles.weather}>
+        오늘의 날씨: {todayWeather + '°C ' + todayCondition}{' '}
+      </Text>
       <Image style={styles.mainImage} source={main} />
       <ScrollView
         style={styles.middleContainer}
@@ -50,27 +61,35 @@ const App: () => Node = () => {
           <Text style={styles.middleButtonText}>꿀팁 찜</Text>
         </TouchableOpacity>
       </ScrollView>
-
       <View style={styles.cardContainer}>
         {/* 하나의 카드 영역을 나타내는 View */}
-        <View style={styles.card}>
-          <Image
-            style={styles.cardImage}
-            source={{
-              uri: 'https://firebasestorage.googleapis.com/v0/b/sparta-image.appspot.com/o/lecture%2Fpizza.png?alt=media&token=1a099927-d818-45d4-b48a-7906fd0d2ad3',
-            }}
-          />
-          <View style={styles.cardText}>
-            <Text style={styles.cardTitle}>먹다 남은 피자를 촉촉하게!</Text>
-            <Text style={styles.cardDesc} numberOfLines={3}>
-              먹다 남은 피자는 수분이 날라가기 때문에 처음처럼 맛있게 먹을 수
-              없는데요. 이럴 경우 그릇에 물을 받아 전자레인지 안에서 1분
-              30초에서 2분 정도 함께 돌려주면 촉촉하게 먹을 수 있습니다. 물이
-              전자레인지 안에서 수증기를 일으키고, 피자에 촉촉함을 더해줍니다.
-            </Text>
-            <Text style={styles.cardDate}>2022.02.10</Text>
-          </View>
-        </View>
+
+        {/* --> 리스트.map일 경우 리스트의 요소 하나하나를 순차적으로 반복하는 형태
+        ---> Json 에 있는 리스트의 내용을 map으로 반복하여 return(랜더링 --> 뷰의 내용을 화면에 그려줌)
+
+       [중요 규칙] --> JSX문법에서 반복으로 돌릴 경우에 그 안의 최상위 태그는 유니크한 Key(키)값을 가져야 함        
+          key={i} 부분
+        */}
+        {tip.map((content, i) => {
+          {
+            /*> JSX 문법 안에서 tip.map()이라는 함수를 사용하기 위해 {}(중괄호)로 감싸였다.  */
+          }
+          return (
+            <View style={styles.card} key={i}>
+              {/* key={i} 부분 : 반복되는 영역의 최상위 태그에서 유니크한 키 값을 가지고 있음 */}
+              <Image style={styles.cardImage} source={{uri: content.image}} />
+              <View style={styles.cardText}>
+                <Text style={styles.cardTitle} numberOfLines={1}>
+                  {content.title}
+                </Text>
+                <Text style={styles.cardDesc} numberOfLines={3}>
+                  {content.desc}
+                </Text>
+                <Text style={styles.cardDate}>{content.date}</Text>
+              </View>
+            </View>
+          );
+        })}
       </View>
     </ScrollView>
   );
@@ -88,13 +107,16 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     //위 공간으로 부터 이격
     marginTop: 50,
-    //왼쪽 공간으로 부터 이격'
+    //왼쪽 공간으로 부터 이격
     marginLeft: 20,
   },
+  weather: {
+    alignSelf: 'flex-end',
+    paddingRight: 20,
+  },
   mainImage: {
-    //컨텐츠의 넓이 값 --> 화면 전체의 90% 크기라는 뜻
-    width: '70%',
-
+    //컨텐츠의 넓이 값
+    width: '90%',
     //컨텐츠의 높이 값
     height: 200,
     //컨텐츠의 모서리 구부리기
@@ -102,8 +124,6 @@ const styles = StyleSheet.create({
     marginTop: 20,
     //컨텐츠 자체가 앱에서 어떤 곳에 위치시킬지 결정(정렬기능)
     //각 속성의 값들은 공식문서에 고대로~ 나와 있음
-    //화면이 flex로 나눠져 있지 않기 때문에 alignItems,justifyContent로 정렬 할 수 없음
-    // 따라서 스스로 정렬해주는 style인 alignSelf를 사용해줘야 함
     alignSelf: 'center',
   },
   middleContainer: {
@@ -136,6 +156,12 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     margin: 7,
   },
+  middleButtonText: {
+    color: '#fff',
+    fontWeight: '700',
+    //텍스트의 현재 위치에서의 정렬
+    textAlign: 'center',
+  },
   middleButton04: {
     width: 100,
     height: 50,
@@ -143,13 +169,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#f886a8',
     borderRadius: 15,
     margin: 7,
-  },
-  middleButtonText: {
-    color: '#fff',
-    fontWeight: '700',
-
-    //텍스트의 현재 위치에서의 정렬
-    textAlign: 'center',
   },
   cardContainer: {
     marginTop: 10,
